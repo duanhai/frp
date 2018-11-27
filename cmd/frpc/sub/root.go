@@ -34,6 +34,7 @@ import (
 	"github.com/fatedier/frp/models/config"
 	"github.com/fatedier/frp/utils/log"
 	"github.com/fatedier/frp/utils/version"
+	"github.com/fatedier/golib/crypto"
 )
 
 const (
@@ -96,6 +97,14 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+func RunClient(configPath string) {
+	crypto.DefaultSalt = "frp"
+	err := runClient(configPath)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
@@ -172,7 +181,7 @@ func parseClientCommonCfgFromCmd() (err error) {
 func runClient(cfgFilePath string) (err error) {
 	err = parseClientCommonCfg(CfgFileTypeIni, cfgFilePath)
 	if err != nil {
-		return
+		return err
 	}
 
 	conf, err := ini.LoadFile(cfgFilePath)
